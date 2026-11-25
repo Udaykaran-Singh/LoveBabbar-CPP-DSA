@@ -1,0 +1,166 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+
+class Node {
+
+    public:
+        int data;
+        Node* left;
+        Node* right;
+
+        Node(int d){
+            this->data = d;
+            this->left = NULL;
+            this->right = NULL;
+        }
+
+};
+
+void levelOrderTraversal(Node* root){
+
+    queue<Node*> q;
+    q.push(root);
+
+    // seperator (root node)
+    q.push(NULL);
+
+    while(!q.empty()){
+        Node* temp = q.front();
+        q.pop();
+
+        // seperator
+        if(temp == NULL){
+            // purana level completely traverse ho chuka ha
+            cout<<endl;
+            if(!q.empty()){
+                // q still have some chile nodes we enter NULL to make next level 
+                q.push(NULL);
+            }
+        }
+        else{
+
+            cout<<temp->data<<" ";
+            
+            if(temp->left){
+                q.push(temp->left);
+            }
+
+            if(temp->right){
+                q.push(temp->right);
+            }
+
+        }
+
+    }
+
+}
+
+Node* insertIntoBST(Node* &root, int d){
+    // base case
+    if(root == NULL){
+        root = new Node(d);
+        return root;
+    }
+
+    if(d > root->data){
+        // right side me insert krna ha
+        root->right = insertIntoBST(root->right, d);
+    }
+    else{
+        // left me insert kro
+        root->left = insertIntoBST(root->left, d);
+    }
+
+    return root;
+
+}
+
+void takeInput(Node* &root){
+
+    int data;
+    cin>> data;
+
+    while(data != -1){
+        insertIntoBST(root, data);
+        cin>>data;
+    }
+}
+
+
+Node* minVal(Node* root){
+    Node* temp = root;
+
+    while(temp->left != NULL){
+        temp = temp->left;
+    }
+    return temp;
+}
+
+Node* Delete_ele(Node* &root, int val){
+
+    // base case
+    if(root == NULL){
+        return NULL;
+    }
+
+    if(root->data == val){
+        // 0 child
+        if(root->left == NULL && root->right == NULL){
+            delete root; 
+            return NULL;
+        }
+
+        // 1 child
+
+            // left child
+            if(root->left != NULL && root->right == NULL){
+                Node* temp = root->left;
+                delete root;
+                return temp;
+            }
+
+            // right child
+            if(root->left == NULL && root->right != NULL){
+                Node* temp = root->right;
+                delete root;
+                return temp;
+            }
+
+        // 2 child
+        if(root->right != NULL && root->left != NULL){
+            int mini = minVal(root->right)->data;
+            root->data = mini;
+            root->right = Delete_ele(root->right, mini);
+        }
+
+    }
+    else if(root->data > val){
+        // left part me jao
+        root->left = Delete_ele(root->left, val);
+        return root;
+    }
+    else{
+        // right part me jao 
+        root->right = Delete_ele(root->right, val);
+        return root;
+    }
+
+    return root;
+
+}
+
+int main(){
+
+    Node* root = NULL;
+    cout<<"Enter data to create binary search tree :"<<endl;
+    takeInput(root);
+
+    levelOrderTraversal(root);
+
+    int d = 4;
+    Delete_ele(root, d);
+
+    levelOrderTraversal(root);
+
+}
